@@ -5,38 +5,41 @@ require 'open-uri'
 
 require 'fog'
 
-if ENV['FOG_MOCK'] == 'true'
-  Fog.mock!
-end
-
 if ENV['PROVIDER']
   describe CarrierWave::Storage::Fog do
     describe ENV['PROVIDER'] do
       before do
-        @bucket = ENV['CARRIERWAVE_TEST_BUCKET']
         @uploader = mock('an uploader')
-        @uploader.stub!(:fog_directory).and_return(@bucket)
+        fog_credentials = case ENV['PROVIDER']
+        when 'AWS'
+          {
+            :aws_access_key_id      => ENV['S3_ACCESS_KEY_ID'],
+            :aws_secret_access_key  => ENV['S3_SECRET_ACCESS_KEY'],
+            :region                 => ENV['S3_REGION']
+          }
+        when 'Google'
+          {
+            :google_storage_access_key_id     => ENV['GOOGLE_STORAGE_ACCESS_KEY_ID'],
+            :google_storage_secret_access_key => ENV['GOOGLE_STORAGE_SECRET_ACCESS_KEY']
+          }
+        when 'Local'
+          {
+            :local_root => ENV['LOCAL_ROOT']
+          }
+        when 'Rackspace'
+          {
+            :rackspace_username => ENV['RACKSPACE_USERNAME'],
+            :rackspace_api_key  => ENV['RACKSPACE_API_KEY']
+          }
+        end
+        @uploader.stub!(:fog_credentials).and_return(fog_credentials.merge!(:provider => ENV['PROVIDER']))
+        @uploader.stub!(:fog_directory).and_return(ENV['CARRIERWAVE_TEST_DIRECTORY'])
         @uploader.stub!(:fog_host).and_return(nil)
         @uploader.stub!(:fog_public).and_return(true)
-        @uploader.stub!(:fog_provider).and_return(ENV['PROVIDER'])
-        case ENV['PROVIDER']
-        when 'AWS'
-          @uploader.stub!(:fog_aws_access_key_id).and_return(ENV['S3_ACCESS_KEY_ID'])
-          @uploader.stub!(:fog_aws_secret_access_key).and_return(ENV['S3_SECRET_ACCESS_KEY'])
-          @uploader.stub!(:fog_aws_region).and_return(ENV['S3_REGION'] || 'us-east-1')
-        when 'Google'
-          @uploader.stub!(:fog_google_storage_access_key_id).and_return(ENV['GOOGLE_STORAGE_ACCESS_KEY_ID'])
-          @uploader.stub!(:fog_google_storage_secret_access_key).and_return(ENV['GOOGLE_STORAGE_SECRET_ACCESS_KEY'])
-        when 'Local'
-          @uploader.stub!(:fog_local_root).and_return(ENV['LOCAL_ROOT'])
-        when 'Rackspace'
-          @uploader.stub!(:fog_rackspace_username).and_return(ENV['RACKSPACE_USERNAME'])
-          @uploader.stub!(:fog_rackspace_api_key).and_return(ENV['RACKSPACE_API_KEY'])
-        end
         @uploader.stub!(:store_path).and_return('uploads/bar.txt')
 
         @storage = CarrierWave::Storage::Fog.new(@uploader)
-        @directory = @storage.connection.directories.new(:key => @bucket)
+        @directory = @storage.connection.directories.new(:key => ENV['CARRIERWAVE_TEST_DIRECTORY'])
         @file = CarrierWave::SanitizedFile.new(file_path('test.jpg'))
       end
 

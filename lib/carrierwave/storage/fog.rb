@@ -45,29 +45,7 @@ module CarrierWave
 
       def connection
         @connection ||= begin
-          params = case uploader.fog_provider
-          when 'AWS'
-            {
-              :aws_access_key_id      => uploader.fog_aws_access_key_id,
-              :aws_secret_access_key  => uploader.fog_aws_secret_access_key,
-              :region                 => uploader.fog_aws_region
-            }
-          when 'Google'
-            {
-              :google_storage_access_key_id     => uploader.fog_google_storage_access_key_id,
-              :google_storage_secret_access_key => uploader.fog_google_storage_secret_access_key
-            }
-          when 'Local'
-            {
-              :local_root => uploader.fog_local_root
-            }
-          when 'Rackspace'
-            {
-              :rackspace_username => uploader.fog_rackspace_username,
-              :rackspace_api_key  => uploader.fog_rackspace_api_key
-            }
-          end
-          ::Fog::Storage.new(params.merge!(:provider => uploader.fog_provider))
+          ::Fog::Storage.new(uploader.fog_credentials)
         end
       end
 
@@ -105,8 +83,8 @@ module CarrierWave
         end
 
         def public_url
-          if @uploader.fog_host
-            @uploader.fog_host << '/' << path
+          if host = @uploader.fog_host
+            host << '/' << path
           else
             file.public_url
           end
