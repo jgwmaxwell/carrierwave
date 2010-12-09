@@ -9,6 +9,52 @@ end
 module CarrierWave
   module Storage
 
+    ##
+    # Stores things using the "fog" gem.
+    #
+    # fog supports storing files with AWS, Google, Local and Rackspace
+    #
+    # You need to setup some options to configure your usage:
+    #
+    # [:fog_credentials]  credentials to for provider
+    # [:fog_directory]    specifies name of directory to store data in
+    # [:fog_host]         (optional) non-default host to serve files from
+    # [:fog_public]       (optional) public readability, defaults to false
+    #
+    #
+    # AWS credentials contain the following keys:
+    #
+    # [:aws_access_key_id]
+    # [:aws_secret_access_key]
+    # [:region]                 (optional) defaults to 'us-east-1'
+    #
+    #
+    # Google credentials contain the following keys:
+    # [:google_storage_access_key_id]
+    # [:google_storage_secrete_access_key]
+    #
+    #
+    # Local credentials contain the following keys:
+    #
+    # [:local_root]             local path to files, defaults to store_path
+    #
+    #
+    # Rackspace credentials contain the following keys:
+    #
+    # [:rackspace_username]
+    # [:rackspace_api_key]
+    #
+    #
+    # A full example with AWS credentials:
+    #     CarrierWave.configure do |config|
+    #       config.fog_credentials = {
+    #         :aws_access_key_id => 'xxxxxx',
+    #         :aws_secret_access_key => 'yyyyyy'
+    #       }
+    #       config.fog_directory = 'directoryname'
+    #       config.fog_public = true
+    #     end
+    #
     class Fog < Abstract
 
       ##
