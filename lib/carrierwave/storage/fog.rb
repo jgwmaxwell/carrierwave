@@ -36,7 +36,7 @@ module CarrierWave
     #
     # Local credentials contain the following keys:
     #
-    # [:local_root]             local path to files, defaults to store_path
+    # [:local_root]             local path to files
     #
     #
     # Rackspace credentials contain the following keys:
@@ -49,7 +49,8 @@ module CarrierWave
     #     CarrierWave.configure do |config|
     #       config.fog_credentials = {
     #         :aws_access_key_id => 'xxxxxx',
-    #         :aws_secret_access_key => 'yyyyyy'
+    #         :aws_secret_access_key => 'yyyyyy',
+    #         :provider => 'AWS'
     #       }
     #       config.fog_directory = 'directoryname'
     #       config.fog_public = true
