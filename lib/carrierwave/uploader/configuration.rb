@@ -15,6 +15,7 @@ module CarrierWave
         add_config :s3_cnamed
         add_config :s3_headers
         add_config :s3_region
+        add_config :cdn_enable
         add_config :cloud_files_username
         add_config :cloud_files_api_key
         add_config :cloud_files_container

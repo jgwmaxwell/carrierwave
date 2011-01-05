@@ -124,14 +124,17 @@ module CarrierWave
 
         def public_url
           if cnamed?
-            ["http://#{bucket}", path].compact.join('/')
+            if deliverable?
+              ["http://#{cdn_bucket}", path].compact.joinh('/')
+            else
+              ["http://#{bucket}", path].compact.join('/')
           else
             ["http://#{bucket}.s3.amazonaws.com", path].compact.join('/')
           end
         end
 
         def authenticated_url
-          connection.get_object_url(bucket, path, Time.now + 60 * 10)
+            connection.get_object_url(bucket, path, Time.now + 60 * 5)
         end
 
         def store(file)
@@ -169,6 +172,10 @@ module CarrierWave
 
         def cnamed?
           @uploader.s3_cnamed
+        end
+        
+        def deliverable?
+          @uploader.cdn_enable
         end
 
         def access_policy
@@ -217,11 +224,18 @@ module CarrierWave
       end
 
       def connection
-        @connection ||= Fog::AWS::Storage.new(
-          :aws_access_key_id => uploader.s3_access_key_id,
-          :aws_secret_access_key => uploader.s3_secret_access_key,
-          :region => uploader.s3_region
-        )
+        if deliverable?
+          @connection ||= Fog::AWS::CDN.new(
+            :aws_access_key_id => ,
+            :aws_secret_access_key =>
+          )
+        else          
+          @connection ||= Fog::AWS::Storage.new(
+            :aws_access_key_id => uploader.s3_access_key_id,
+            :aws_secret_access_key => uploader.s3_secret_access_key,
+            :region => uploader.s3_region
+          )
+        end
       end
 
     end # S3
