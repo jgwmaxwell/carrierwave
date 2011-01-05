@@ -186,6 +186,10 @@ module CarrierWave
           @uploader.s3_bucket
         end
 
+        def cdn_bucket
+          @uploader.cdn_bucket
+        end
+
         def connection
           @base.connection
         end
