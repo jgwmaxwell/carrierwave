@@ -128,6 +128,7 @@ module CarrierWave
               ["http://#{cdn_bucket}", path].compact.joinh('/')
             else
               ["http://#{bucket}", path].compact.join('/')
+            end
           else
             ["http://#{bucket}.s3.amazonaws.com", path].compact.join('/')
           end
